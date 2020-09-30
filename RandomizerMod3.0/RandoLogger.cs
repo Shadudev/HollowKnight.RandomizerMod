@@ -557,12 +557,18 @@ namespace RandomizerMod
                 List<string> progression = new List<string>();
                 foreach ((int, string, string) pair in orderedILPairs)
                 {
-                    if (LogicManager.GetItemDef(pair.Item2).progression) progression.Add($"({pair.Item1}) {pair.Item2}<---at--->{pair.Item3}");
+                    string cost = "";
+                    if (LogicManager.TryGetItemDef(pair.Item3, out ReqDef itemDef)) {
+                        if (itemDef.cost != 0) cost = $" [{itemDef.cost} {itemDef.costType.ToString("g")}]";
+                    }
+                    else cost = $" [{RandomizerMod.Instance.Settings.GetShopCost(pair.Item2)} Geo]";
+
+                    if (LogicManager.GetItemDef(pair.Item2).progression) progression.Add($"({pair.Item1}) {pair.Item2}<---at--->{pair.Item3}{cost}");
                     if (LogicManager.TryGetItemDef(pair.Item3, out ReqDef locationDef))
                     {
-                        areaItemLocations[locationDef.areaName].Add($"({pair.Item1}) {pair.Item2}<---at--->{pair.Item3}");
+                        areaItemLocations[locationDef.areaName].Add($"({pair.Item1}) {pair.Item2}<---at--->{pair.Item3}{cost}");
                     }
-                    else areaItemLocations[pair.Item3].Add(pair.Item2);
+                    else areaItemLocations[pair.Item3].Add($"{pair.Item2}{cost}");
                 }
 
                 AddToLog(Environment.NewLine + "PROGRESSION ITEMS");
