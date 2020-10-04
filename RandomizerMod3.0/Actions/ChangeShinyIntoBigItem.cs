@@ -84,17 +84,17 @@ namespace RandomizerMod.Actions
             charm.ClearTransitions();
             charm.AddTransition("FINISHED", "Big Item?");
 
-            // Check if each additive item has already been obtained. Give 100 geo instead of popup if so.
+            // Check if each additive item has already been obtained. Give 300 geo instead of popup if so.
             bigItem.ClearTransitions();
             bigItem.AddFirstAction(new RandomizerExecuteLambda(() => bigItem.AddTransition("FINISHED", BigItemPopup.AdditiveMaxedOut(_itemDefs) ? "Trink Flash" : "Big Get Flash"))); // if we have duplicates, the last item is not a big popup
 
-            // give 100 geo for last duplicate
+            // give 300 geo for last duplicate
             trinkFlash.ClearTransitions();
             trinkFlash.AddTransition("FINISHED", "Store Key");
             fsm.GetState("Trinket Type").ClearTransitions();
             trinkFlash.AddTransition("FINISHED", "Store Key");
             giveTrinket.RemoveActionsOfType<SetPlayerDataBool>();
-            giveTrinket.AddAction(new RandomizerExecuteLambda(() => GiveItem(GiveItemActions.GiveAction.AddGeo, _item, _location, new System.Random(RandomizerMod.Instance.Settings.Seed + _item.GetHashCode()).Next(100, 500))));
+            giveTrinket.AddAction(new RandomizerExecuteLambda(() => GiveItem(GiveItemActions.GiveAction.AddGeo, _item, _location, 300)));
             giveTrinket.GetActionsOfType<GetLanguageString>().First().convName = _itemDefs.Last().NameKey;
             giveTrinket.GetActionsOfType<SetSpriteRendererSprite>().First().sprite = RandomizerMod.GetSprite(Randomization.LogicManager.GetItemDef(_itemDefs.Last().Name).shopSpriteKey);
 
