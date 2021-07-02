@@ -11,7 +11,7 @@ using RandomizerMod.Randomization;
 
 namespace RandomizerMod
 {
-    internal static class LanguageStringManager
+    public static class LanguageStringManager
     {
         private static readonly Dictionary<string, Dictionary<string, string>> LanguageStrings =
             new Dictionary<string, Dictionary<string, string>>();

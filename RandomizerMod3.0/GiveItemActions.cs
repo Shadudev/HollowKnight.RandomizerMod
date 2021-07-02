@@ -13,6 +13,9 @@ namespace RandomizerMod
     // WORK IN PROGRESS
     public static class GiveItemActions
     {
+        public static List<Func<GiveAction, string, string, int, bool>> ExternItemHandlers { get; set; } =
+            new List<Func<GiveAction, string, string, int, bool>>();
+
         public enum GiveAction
         {
             Bool = 0,
@@ -62,8 +65,20 @@ namespace RandomizerMod
             popup.SetActive(true);
         }
 
+        private static bool TryExternHandleItem(GiveAction action, string item, string location, int geo)
+        {
+            foreach (var externItemHandler in ExternItemHandlers)
+                if (externItemHandler(action, item, location, geo))
+                    return true;
+            
+            return false;
+        }
+
         public static void GiveItem(GiveAction action, string item, string location, int geo = 0)
         {
+            if (TryExternHandleItem(action, item, location, geo))
+                return;
+
             LogItemToTracker(item, location);
             RandomizerMod.Instance.Settings.MarkItemFound(item);
             RandomizerMod.Instance.Settings.MarkLocationFound(location);
@@ -73,7 +88,7 @@ namespace RandomizerMod
 
             if (RandomizerMod.Instance.globalSettings.RecentItems)
             {
-                RecentItems.AddItem(item, location, showArea: true);
+                RecentItems.AddItem(item, location);
             }
 
             switch (action)

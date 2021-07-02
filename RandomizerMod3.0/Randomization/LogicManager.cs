@@ -13,7 +13,7 @@ using GlobalEnums;
 
 namespace RandomizerMod.Randomization
 {
-    internal enum ItemType
+    public enum ItemType
     {
         Big,
         Charm,
@@ -45,7 +45,7 @@ namespace RandomizerMod.Randomization
         public bool deadEnd;
         public int oneWay; // 0 == 2-way, 1 == can only go in, 2 == can only come out
     }
-    internal struct ReqDef
+    public struct ReqDef
     {
         // Control variables
         public string boolName;
@@ -172,7 +172,7 @@ namespace RandomizerMod.Randomization
 #pragma warning restore 0649
     // ReSharper restore InconsistentNaming
 
-    internal static class LogicManager
+    public static class LogicManager
     {
         private static Dictionary<string, TransitionDef> _areaTransitions;
         private static Dictionary<string, TransitionDef> _roomTransitions;
@@ -341,7 +341,7 @@ namespace RandomizerMod.Randomization
             return _roomTransitions.ContainsKey(transition);
         }
 
-        public static TransitionDef GetTransitionDef(string name)
+        internal static TransitionDef GetTransitionDef(string name)
         {
             if (RandomizerMod.Instance.Settings.RandomizeAreas && _areaTransitions.TryGetValue(name, out TransitionDef def1))
             {
@@ -399,7 +399,7 @@ namespace RandomizerMod.Randomization
             _items[item] = newDef;
         }
 
-        public static StartDef GetStartLocation(string start)
+        internal static StartDef GetStartLocation(string start)
         {
             if (!_startLocations.TryGetValue(start, out StartDef def))
             {
@@ -493,7 +493,7 @@ namespace RandomizerMod.Randomization
             return _items.Values.Where(val => val.shopBool == shopBool).Any();
         }
 
-        public static ShopDef GetShopDef(string name)
+        internal static ShopDef GetShopDef(string name)
         {
             if (!_shops.TryGetValue(name, out ShopDef def))
             {

@@ -47,7 +47,7 @@ namespace RandomizerMod.Randomization
             item = LogicManager.RemoveDuplicateSuffix(item);
             if (!LogicManager.progressionBitMask.TryGetValue(item, out (int, int) a))
             {
-                RandomizerMod.Instance.LogWarn("Could not find progression value corresponding to: " + item);
+                // RandomizerMod.Instance.LogWarn("Could not find progression value corresponding to: " + item);
                 return;
             }
             obtained[a.Item2] |= a.Item1;

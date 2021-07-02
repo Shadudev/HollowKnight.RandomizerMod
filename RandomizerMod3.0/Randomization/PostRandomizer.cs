@@ -2,29 +2,56 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using RandomizerMod.Actions;
 using static RandomizerMod.LogHelper;
 using static RandomizerMod.Randomization.Randomizer;
 
 namespace RandomizerMod.Randomization
 {
-    internal static class PostRandomizer
+    public static class PostRandomizer
     {
-        public static void PostRandomizationTasks()
+        public static Action PostRandomizationActions;
+
+        public static void RunPostRandomizationTasks()
         {
-            RemovePlaceholders();
-            SaveAllPlacements();
+            PostRandomizationActions.Invoke();
+        }
+
+        // Tasks names in this functions are crucial for MW's functionality
+        internal static void InitializeTasks()
+        {
+            PostRandomizationActions = RemovePlaceholders;
+            PostRandomizationActions += SaveAllPlacements;
+            PostRandomizationActions += CreateSpoilers;
+            PostRandomizationActions += CreateActions; 
+        }
+
+        internal static void CreateSpoilers()
+        {
+            if (!RandomizerMod.Instance.Settings.CreateSpoilerLog) return;
+
             // Locations in the Vanilla manager where the location is a shop count as vanilla; otherwise, if the item and location
             // do not match we should log them. In particular, the split cloak pieces in the vanilla manager should be logged.
-            (int, string, string)[] orderedILPairs = RandomizerMod.Instance.Settings.ItemPlacements
+            (int, string, string)[] orderedILPairs = getOrderedILPairs();
+
+            // TODO For MW: LogAllToSpoiler - Provide a pre-generated ItemsSpoiler section from server which emits the itemspoiler generation call
+            RandoLogger.LogAllToSpoiler(orderedILPairs, RandomizerMod.Instance.Settings._transitionPlacements.Select(kvp => (kvp.Key, kvp.Value)).ToArray());
+
+            // TODO For MW: LogItemsToCondensedSpoiler - Provide allIlPairs.Where(Either Key is player's);
+            RandoLogger.LogItemsToCondensedSpoiler(orderedILPairs);
+        }
+
+        private static void CreateActions()
+        {
+            RandomizerAction.CreateActions(RandomizerMod.Instance.Settings.ItemPlacements, RandomizerMod.Instance.Settings);
+        }
+
+        public static (int, string, string)[] getOrderedILPairs()
+        {
+            return RandomizerMod.Instance.Settings.ItemPlacements
                 .Except(VanillaManager.Instance.ItemPlacements.Where(pair => (pair.Item1 == pair.Item2) || LogicManager.ShopNames.Contains(pair.Item2)))
                 .Select(pair => (ItemManager.locationOrder.TryGetValue(pair.Item2, out int loc) ? loc : 0, pair.Item1, pair.Item2))
                 .ToArray();
-
-            if (RandomizerMod.Instance.Settings.CreateSpoilerLog)
-            {
-                RandoLogger.LogAllToSpoiler(orderedILPairs, RandomizerMod.Instance.Settings._transitionPlacements.Select(kvp => (kvp.Key, kvp.Value)).ToArray());
-                RandoLogger.LogItemsToCondensedSpoiler(orderedILPairs);
-            }
         }
 
         private static void RemovePlaceholders()
@@ -77,7 +104,8 @@ namespace RandomizerMod.Randomization
                 foreach (string item in kvp.Value)
                 {
                     if (VanillaManager.Instance.ItemPlacements.Contains((item, kvp.Key))) continue;
-                    RandomizeShopCost(item);
+                    int cost = GetRandomizedShopCost(item);
+                    RandomizerMod.Instance.Settings.AddShopCost(item, cost);
                 }
             }
 
@@ -109,7 +137,7 @@ namespace RandomizerMod.Randomization
             RandomizerMod.Instance.Settings.StartMapZone = (int)startDef.zone;
         }
 
-        public static void RandomizeShopCost(string item)
+        public static int GetRandomizedShopCost(string item)
         {
             int cost;
             ReqDef def = LogicManager.GetItemDef(item);
@@ -141,8 +169,7 @@ namespace RandomizerMod.Randomization
                 cost *= priceFactor;
             }
 
-            cost = Math.Max(cost, 1);
-            RandomizerMod.Instance.Settings.AddShopCost(item, cost);
+            return Math.Max(cost, 1);
         }
 
         public static List<(string, string)> GetPlacedItemPairs()

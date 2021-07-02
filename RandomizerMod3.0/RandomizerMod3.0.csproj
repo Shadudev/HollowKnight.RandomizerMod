@@ -111,6 +111,9 @@
     <Compile Include="Actions\ChangeCrystalShamanReward.cs" />
     <Compile Include="Actions\ChangeSanctumShamanReward.cs" />
     <Compile Include="Actions\ShowLoreTextInShop.cs" />
+    <Compile Include="Extensions\RandoMenuItem.cs" />
+    <Compile Include="MultiWorld\IMultiWorldCompatibleRandomizer.cs" />
+    <Compile Include="MultiWorld\MultiWorldMenu.cs" />
     <Compile Include="Randomization\MiniPM.cs" />
     <Compile Include="RecentItems.cs" />
     <Compile Include="CustomSkills.cs" />

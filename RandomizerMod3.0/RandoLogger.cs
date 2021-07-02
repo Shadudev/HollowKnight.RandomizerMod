@@ -696,10 +696,14 @@ namespace RandomizerMod
                 foreach (var triplet in orderedILPairs)
                 {
                     string cost = "";
-                    if (LogicManager.TryGetItemDef(triplet.Item3, out ReqDef itemDef)) {
+                    if (LogicManager.TryGetItemDef(triplet.Item3, out ReqDef itemDef))
+                    {
                         if (itemDef.cost != 0) cost = $" [{itemDef.cost} {itemDef.costType.ToString("g")}]";
                     }
-                    else cost = $" [{RandomizerMod.Instance.Settings.GetShopCost(triplet.Item2)} Geo]";
+                    else if (RandomizerMod.Instance.Settings.HasShopCost(triplet.Item2))
+                    {
+                        cost = $" [{RandomizerMod.Instance.Settings.GetShopCost(triplet.Item2)} Geo]";
+                    }
 
                     string itemLocation = triplet.Item3.Replace("_", " ");
 

@@ -32,6 +32,8 @@ namespace RandomizerMod
         /// <remarks>item, location</remarks>
         public (string, string)[] ItemPlacements => _itemPlacements.Select(pair => (pair.Key, pair.Value)).ToArray();
 
+        public int NumItemsFound => _obtainedItems.Keys.Intersect(_itemPlacements.Keys).Count();
+
         public int MaxOrder => _orderedLocations.Count;
 
         public (string, int)[] VariableCosts => _variableCosts.Select(pair => (pair.Key, pair.Value)).ToArray();
@@ -40,12 +42,19 @@ namespace RandomizerMod
         public bool RandomizeTransitions => RandomizeAreas || RandomizeRooms;
 
         public bool FreeLantern => !(DarkRooms || RandomizeKeys);
+
+        // Used by mods who are loaded before and have a dependency relation with RandomizerMod
+        public static Action<SaveSettings> PreAfterDeserialize = null;
         public SaveSettings()
         {
             AfterDeserialize += () =>
             {
                 if (Randomizer)
                 {
+                    PreAfterDeserialize.Invoke(this);
+                    // Wiped to prevent old callbacks to be called on next save slots loading
+                    PreAfterDeserialize = null;
+
                     RandomizerMod.Instance.HookRandomizer();
                     RandomizerAction.CreateActions(ItemPlacements, this);
                 }
@@ -544,6 +553,11 @@ namespace RandomizerMod
             _itemPlacements[item] = location;
         }
 
+        public void RemoveItem(string oldItem)
+        {
+            _itemPlacements.Remove(oldItem);
+        }
+
         public void AddOrderedLocation(string location, int order)
         {
             _orderedLocations[location] = order;
@@ -597,6 +611,16 @@ namespace RandomizerMod
             return _shopCosts[item];
         }
 
+        public bool HasShopCost(string item)
+        {
+            return _shopCosts.ContainsKey(item);
+        }
+
+        public void RemoveShopCost(string item)
+        {
+            if (!_shopCosts.ContainsKey(item)) return;
+            _shopCosts.Remove(item);
+        }
 
         public void MarkItemFound(string item)
         {
@@ -626,6 +650,7 @@ namespace RandomizerMod
 
         public void MarkLocationFound(string location)
         {
+            if (string.IsNullOrEmpty(location)) return;
             _obtainedLocations[location] = true;
         }
 

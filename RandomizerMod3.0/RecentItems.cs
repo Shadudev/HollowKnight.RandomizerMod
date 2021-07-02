@@ -36,7 +36,7 @@ namespace RandomizerMod
             items.Clear();
         }
 
-        public static void AddItem(string item, string location, bool showArea = true)
+        public static void AddItem(string item, string location)
         {
             if (canvas == null)
             {
@@ -47,10 +47,10 @@ namespace RandomizerMod
 
             string itemName = LanguageStringManager.GetLanguageString(LogicManager.GetItemDef(item).nameKey, "UI");
             string areaName = LogicManager.ShopNames.Contains(location)
-                ? location.Replace('_', ' ')
-                : RandoLogger.CleanAreaName(LogicManager.GetItemDef(location).areaName);
+                    ? location.Replace('_', ' ')
+                    : RandoLogger.CleanAreaName(LogicManager.GetItemDef(location).areaName);
 
-            string msg = showArea ? itemName + "\nfrom " + areaName : itemName;
+            string msg = itemName + "\nfrom " + areaName;
 
             GameObject basePanel = CanvasUtil.CreateBasePanel(canvas,
                 new CanvasUtil.RectData(new Vector2(200, 50), Vector2.zero,

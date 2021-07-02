@@ -12,7 +12,7 @@ using static RandomizerMod.LogHelper;
 
 namespace RandomizerMod.Actions
 {
-    internal class AddYNDialogueToShiny : RandomizerAction
+    public class AddYNDialogueToShiny : RandomizerAction
     {
         public enum CostType
         {
